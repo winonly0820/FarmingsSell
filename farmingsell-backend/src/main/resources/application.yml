@@ -1,0 +1,15 @@
+server:
+  port: 8082
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB  #这是单个文件的最大大小
+      max-request-size: 10MB  #这是请求文件的最大大小
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${ip}:3306/farmings_sell?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: "0107"
+
+#数据库主机地址
+ip: localhost

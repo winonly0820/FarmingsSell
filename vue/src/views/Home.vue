@@ -1,10 +1,14 @@
 <script>
+import router from "@/router";
+
 export default {
   name: "home",
   data(){
     return{
       fruitsData:[],
       vegetablesData:[],
+      user:[
+      ]
     }
   },
   // created的作用是一进入网页就进行加载这个东西，就是操作调用某个方法
@@ -17,6 +21,9 @@ created() {
     this.getVegetablesData()
   },
   methods:{
+    router() {
+      return router
+    },
     getFruitsData(){
       this.$request.get('/show/fruit').then(res=>{
         this.fruitsData=res.data;
@@ -27,6 +34,7 @@ created() {
       this.$request.get('/show/vegetable').then(res=>{
         this.vegetablesData=res.data;
       })},
+  //   下面的方法是用来固定数据的格式的
   formatPrice(row, column, cellValue) {
     // cellValue 是当前行的price值
     if (cellValue === null || cellValue === undefined) return '';
@@ -48,6 +56,7 @@ created() {
 </script>
 
 <template>
+
 <el-container>
   <el-header style="height: 15vh;background: bisque;padding: 0">
 <el-row>
@@ -55,17 +64,28 @@ created() {
     <el-button style="">此处是菜单目录栏</el-button>
   </el-col>
   <el-col :span="6">
-<el-dropdown>
 
+<!--    当用户已经登陆，从本地获取token了-->
+<el-dropdown v-if="user.token" >
 <!-- 图片的显示逻辑，如果存在user.token则从本地存储中提取头像并且显示，如果没有token则显示默认的头像-->
-    <img src="@/assets/logo.png" alt="" style="border-radius: 50%;overflow: hidden;width: 60px;height:100%">
+    <img src="@/assets/logo.png" alt="" style="border-radius: 50%;width: 60px;height:100%">
     <el-dropdown-menu slot="dropdown">
-      <el-dropdown-item @click="$router.push('/login')">去登录</el-dropdown-item>
-      <el-dropdown-item>我是大神2</el-dropdown-item>
-      <el-dropdown-item>我是大神1</el-dropdown-item>
+<!--      <el-dropdown-item @click.native="$router.push('/login')">个人中心</el-dropdown-item>-->
+      <el-dropdown-item>我的订单</el-dropdown-item>
+      <el-dropdown-item>配送过程</el-dropdown-item>
       <el-dropdown-item>我是大神1</el-dropdown-item>
     </el-dropdown-menu>
 </el-dropdown>
+
+
+
+<!--    当用户尚未登陆时候显示的默认页面-->
+      <!-- 图片的显示逻辑，如果存在user.token则从本地存储中提取头像并且显示，如果没有token则显示默认的头像-->
+      <img v-if="!user.token"  @click="$router.push('/login')" src="@/assets/Unlogin.png" alt="" style="
+      overflow: hidden;width:30%;height:70%;margin-top: 30px;margin-left: 200px;cursor: pointer">
+
+
+
 
   </el-col>
 </el-row>

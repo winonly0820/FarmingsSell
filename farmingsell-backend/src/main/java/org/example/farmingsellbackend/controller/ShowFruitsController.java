@@ -1,5 +1,6 @@
 package org.example.farmingsellbackend.controller;
 
+import org.example.farmingsellbackend.common.AuthAccess;
 import org.example.farmingsellbackend.common.Result;
 import org.example.farmingsellbackend.entity.Fruits;
 import org.example.farmingsellbackend.service.ShowFruitsService;
@@ -23,6 +24,7 @@ public class ShowFruitsController {
     @Autowired
     ShowFruitsService showFruitsService;
 //    json数据序列化失败，我在request文件中添加了请求头，在这里强制返回了json
+    @AuthAccess
     @GetMapping(value = "/fruit", produces = "application/json")
 //    下面result后面的那个方法是service层的方法
     public Result selectAllFruits(){

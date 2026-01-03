@@ -1,5 +1,6 @@
 package org.example.farmingsellbackend.controller;
 
+import org.example.farmingsellbackend.common.AuthAccess;
 import org.example.farmingsellbackend.common.Result;
 import org.example.farmingsellbackend.entity.Vegetables;
 import org.example.farmingsellbackend.service.ShowVegetablesService;
@@ -22,6 +23,7 @@ import java.util.List;
 public class ShowVegetablesController {
     @Autowired
     ShowVegetablesService showVegetablesService;
+    @AuthAccess
     @GetMapping(value="/vegetable", produces = "application/json")
     public Result selectAllVegetables(){
         List<Vegetables> vegetablesList=showVegetablesService.list();

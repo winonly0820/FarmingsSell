@@ -23,7 +23,8 @@ import java.util.Date;
 @Component
 //通过上面这个注解，将这个代码注入到springboot容器中去
 public class TokenUtils {
-
+    private static final String AES_KEY = "12345678901234561234567890123456"; // 32位密钥
+    private static final String AES_IV  = "1234567890123456";                 // 16位IV
     private static UserMapper staticUserMapper;
 
     @Resource
@@ -34,6 +35,17 @@ public class TokenUtils {
         staticUserMapper = userMapper;
     }
 
+//    public static String createToken(String userId, String role) {
+//        // 构造载荷内容：userId + 过期时间戳
+//        String content = userId + ":" + (System.currentTimeMillis() + 2 * 3600 * 1000);
+//
+//        // 使用你定义的密钥和 IV 进行 AES-256-CBC 加密
+//        cn.hutool.crypto.symmetric.AES aes = cn.hutool.crypto.SecureUtil.aes(AES_KEY.getBytes());
+//        aes.setIv(AES_IV.getBytes());
+//
+//        // 返回加密后的十六进制字符串作为 Token
+//        return aes.encryptHex(content);
+//    }
     public static String createToken(String userId, String sign) {
         return JWT.create().withAudience(userId) // 将 user id 保存到 token 里面，作为载荷
                 .withExpiresAt(DateUtil.offsetHour(new Date(), 2)) // 2小时后token过期，这个写法表示当前时间往后推移俩小时的过期时间

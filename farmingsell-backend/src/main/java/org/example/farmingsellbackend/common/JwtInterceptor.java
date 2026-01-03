@@ -47,6 +47,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             }
         }
 
+
         // 执行认证
         if (StrUtil.isBlank(token)) {
             throw new ServiceException("401", "请登录");

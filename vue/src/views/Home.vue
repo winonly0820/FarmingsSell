@@ -7,8 +7,9 @@ export default {
     return{
       fruitsData:[],
       vegetablesData:[],
-      user:[
-      ]
+      // 在这里直接把本地存储中的json数据给转化一下，后续可以直接调用使用
+      user:JSON.parse(localStorage.getItem('User-login')||'{}'),
+
     }
   },
   // created的作用是一进入网页就进行加载这个东西，就是操作调用某个方法
@@ -17,8 +18,7 @@ created() {
     this.getVegetablesData()
 },
   mounted() {
-    this.getFruitsData()
-    this.getVegetablesData()
+
   },
   methods:{
     router() {
@@ -58,7 +58,7 @@ created() {
 <template>
 
 <el-container>
-  <el-header style="height: 15vh;background: bisque;padding: 0">
+  <el-header style="height: 10vh;background: bisque;padding: 0">
 <el-row>
   <el-col :span="18">
     <el-button style="">此处是菜单目录栏</el-button>
@@ -66,21 +66,26 @@ created() {
   <el-col :span="6">
 
 <!--    当用户已经登陆，从本地获取token了-->
-<el-dropdown v-if="user.token" >
+<!--<el-dropdown v-if="user.token" >-->
 <!-- 图片的显示逻辑，如果存在user.token则从本地存储中提取头像并且显示，如果没有token则显示默认的头像-->
-    <img src="@/assets/logo.png" alt="" style="border-radius: 50%;width: 60px;height:100%">
-    <el-dropdown-menu slot="dropdown">
-<!--      <el-dropdown-item @click.native="$router.push('/login')">个人中心</el-dropdown-item>-->
-      <el-dropdown-item>我的订单</el-dropdown-item>
-      <el-dropdown-item>配送过程</el-dropdown-item>
-      <el-dropdown-item>我是大神1</el-dropdown-item>
-    </el-dropdown-menu>
-</el-dropdown>
+    <img src="@/assets/logo.png" alt="" @click="$router.push('/manager')" v-if="user.token"
+    style="overflow: hidden;width:25%;height:70%;margin-left: 100px;cursor: pointer;margin-bottom: 20px"
+    >
+<!--    <el-dropdown-menu slot="dropdown">-->
+<!--&lt;!&ndash;      <el-dropdown-item @click.native="$router.push('/login')">个人中心</el-dropdown-item>&ndash;&gt;-->
+<!--      <el-dropdown-item @click.native="$router.push('/profile')">个人主页</el-dropdown-item>-->
+<!--      <el-dropdown-item>配送过程</el-dropdown-item>-->
+<!--      <el-dropdown-item>我是大神1</el-dropdown-item>-->
+<!--    </el-dropdown-menu>-->
+<!--</el-dropdown>-->
 
 
 
 <!--    当用户尚未登陆时候显示的默认页面-->
       <!-- 图片的显示逻辑，如果存在user.token则从本地存储中提取头像并且显示，如果没有token则显示默认的头像-->
+
+
+<!--    这里直接写v-if是不行的，你就算data中拿到了数据，你也没有进行调用，你得写一个方法，等页面加载出来的第一时间，你就得让他再调用一次，让他从本地调用出你的数据-->
       <img v-if="!user.token"  @click="$router.push('/login')" src="@/assets/Unlogin.png" alt="" style="
       overflow: hidden;width:30%;height:70%;margin-top: 30px;margin-left: 200px;cursor: pointer">
 
@@ -91,10 +96,10 @@ created() {
 </el-row>
 
   </el-header>
-  <el-main style="height: 80vh;padding: 0;background: #42b983">
+  <el-main style="height: 90vh;padding: 0;background: #42b983;padding: 10px">
     <el-row :gutter="20">
       <el-col :span="8" >
-        <div style="background: white; height: 70vh;margin-left: 30px">
+        <div style="background: white; height: 70vh;">
           <div style="height: 15%;background: chocolate">
 
           </div>
@@ -117,6 +122,14 @@ created() {
       </el-col>
       <el-col :span="8">
         <div style="background: chocolate; height: 70vh;">
+
+            <el-row>
+              <el-col :span="18"></el-col>
+              <div style="background-color: blue"></div>
+              <el-col :span="6" style="background-color: blue"></el-col>
+            </el-row>
+
+
         </div> <!-- 统一背景色 -->
       </el-col>
     </el-row>
@@ -130,5 +143,9 @@ created() {
 </template>
 
 <style scoped>
+
+.el-main{
+  height: 82vh;
+}
 
 </style>

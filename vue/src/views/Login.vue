@@ -1,9 +1,12 @@
+
+
 <!--我很好奇这个this.他在好多地方都用到了，但是我不明白，为什么这个非要使用this.，他到底有什么作用，是指的是调用吗？还是说为了强调，后来我发现，这个this.的作用可能是-->
 <!--为了强调，这个后面的变量或者方法等，是在这个文件中定义的，避免与其他文件的变量方法混淆，如果直接理解成这个文件中定义的也对，因为在全局变量main文件中挂载的东西是可以直接使用的-->
 <!--但是从其他文件中导入的变量是无法使用的，这就是一些小小的区别-->
 
 
 <script>
+import { encrypt } from "@/utils/rsaEncrypt";
 export default {
   name: "login",
   data() {
@@ -29,22 +32,56 @@ export default {
     login() {
       this.$refs['loginRef'].validate((valid) => {
         if (valid) {
-          this.$request.post('/user/login', this.user).then(res => {
-            if (res.code === 200) {
-              localStorage.setItem("User-login", JSON.stringify(res.data));
-              this.$router.push('/')
-              this.$message.success('登录成功')
+          // 2. 深度克隆，避免修改页面输入框的内容
+          let loginData = JSON.parse(JSON.stringify(this.user));
+
+          // 3. 核心步骤：对密码进行 RSA 加密
+          loginData.password = encrypt(loginData.password);
+
+          // 4. 发送加密后的 loginData 而不是 this.user
+          this.$request.post('/user/login', loginData).then(res => {
+            if (res.code === 200) { // 建议使用字符串 '200' 匹配后端 Result 习惯
+              const userStore = {
+                token: res.data.token,
+                username: res.data.username,
+                role: res.data.role
+              };
+              localStorage.setItem("User-login", JSON.stringify(userStore));
+              this.$router.push('/');
+              this.$message.success('登录成功');
             } else {
-              this.$message.error(res.msg)
+              this.$message.error(res.msg);
             }
           })
         }
       })
-
     }
-  }
-
-}
+    // login() {
+    //   this.$refs['loginRef'].validate((valid) => {
+    //     if (valid) {
+    //       this.$request.post('/user/login', this.user).then(res => {
+    //         if (res.code === 200) {
+    //           const loginData = {
+    //             token: res.data.token,
+    //             username: res.data.username,
+    //             role: res.data.role // 满足 RBAC 权限控制需要
+    //           };
+    //
+    //           // 存储过滤后的对象，不再包含 password 字段
+    //           localStorage.setItem("User-login", JSON.stringify(loginData));
+    //
+    //           // --- 修改结束 ---
+    //
+    //           this.$router.push('/');
+    //           this.$message.success('登录成功');
+    //         } else {
+    //           this.$message.error(res.msg);
+    //         }
+    //       })
+    //     }
+    //   })
+    // }
+  }}
 </script>
 
 <template>
@@ -71,7 +108,7 @@ export default {
           </div>
         </el-form-item>
         <div style="display: flex;margin-left: 350px">还没有账号？现在去
-          <div style="color: blue;cursor: pointer;" @click="$router.push('/')">
+          <div style="color: blue;cursor: pointer;" @click="$router.push('/register')">
             注册
           </div>
           <div>一个</div>

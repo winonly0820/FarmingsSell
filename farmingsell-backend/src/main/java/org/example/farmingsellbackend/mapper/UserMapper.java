@@ -6,4 +6,5 @@ import org.example.farmingsellbackend.entity.User;
 
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
+
 }

@@ -6,13 +6,30 @@ export default {
   name: "manager",
   methods: {
     Logout() {
+      // 1. 清除本地存储（Token, SessionKey, Role 等全部销毁）
       localStorage.removeItem('User-login');
+
+      // 2. 清除当前组件内存中的 user 信息（防止逻辑残留）
+      if (this.user) {
+        this.user = {};
+      }
+
       this.$message({
-        message: '账号已登出，返回登录页中...',
+        message: '账号已登出',
         type: 'success'
       });
+
+      // 3. 建议跳转到登录页而非首页
       this.$router.push('/');
     }
+    // Logout() {
+    //   localStorage.removeItem('User-login');
+    //   this.$message({
+    //     message: '账号已登出，返回登录页中...',
+    //     type: 'success'
+    //   });
+    //   this.$router.push('/');
+    // }
   }
 }
 </script>
@@ -25,7 +42,7 @@ export default {
         <img src="@/assets/茶叶.jpg" alt="商城logo" style="height: 80px;border-radius: 50%;margin-left: 30px">
       </el-col>
       <el-col style="display: flex" :span="18">
-        <div style="align-items: center;justify-content: center">欢迎进入农贸大市场管理系统</div>
+        <div style="align-items: center;justify-content: center">欢迎进入农贸大市场后台管理系统</div>
       </el-col>
       <el-col>
         <el-button @click="Logout">
@@ -42,8 +59,17 @@ export default {
           <el-col>
             <el-menu style="display: flex">
               <el-col>
-                <el-menu-item style="height: 80px;display: flex;align-items: center;justify-content: center">
-                  <div style="">个人信息</div>
+<!--                <el-menu-item style="height: 80px;display: flex;align-items: center;justify-content: center;"@click.native="$router.push('manager/home')">-->
+<!--                  <div style="">主页</div>-->
+<!--                </el-menu-item>-->
+<!--                <el-menu-item style="height: 80px;display: flex;align-items: center;justify-content: center"@click.native="$router.push('manager/person')">-->
+<!--                  <div style="">个人信息</div>-->
+<!--                </el-menu-item>-->
+                <el-menu-item style="height: 80px;display: flex;align-items: center;justify-content: center;" @click.native="$router.push('/manager/home')">
+                  <div>主页</div>
+                </el-menu-item>
+                <el-menu-item style="height: 80px;display: flex;align-items: center;justify-content: center;" @click.native="$router.push('/manager/person')">
+                  <div>个人信息</div>
                 </el-menu-item>
               <el-menu-item style="height: 80px;display: flex;align-items: center;justify-content: center">
                   <div style="">用户管理</div>
@@ -62,7 +88,7 @@ export default {
       </el-aside>
 
       <el-main style="background-color: #F0F8FF;">
-        Main
+        <router-view />
       </el-main>
     </el-container>
   </el-container>

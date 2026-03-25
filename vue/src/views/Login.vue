@@ -32,19 +32,22 @@ export default {
     login() {
       this.$refs['loginRef'].validate((valid) => {
         if (valid) {
-          // 2. 深度克隆，避免修改页面输入框的内容
+          if (!this.user.username || !this.user.password) {
+            this.$message.warning("账号或密码不能为空");
+            return;
+          }
+
           let loginData = JSON.parse(JSON.stringify(this.user));
-
-          // 3. 核心步骤：对密码进行 RSA 加密
+          //对密码进行 RSA 加密
           loginData.password = encrypt(loginData.password);
-
-          // 4. 发送加密后的 loginData 而不是 this.user
+          //发送加密后的loginData
           this.$request.post('/user/login', loginData).then(res => {
-            if (res.code === 200) { // 建议使用字符串 '200' 匹配后端 Result 习惯
+            if (res.code === 200) {
               const userStore = {
                 token: res.data.token,
                 username: res.data.username,
-                role: res.data.role
+                role: res.data.role,
+                sessionKey: res.data.sessionKey,
               };
               localStorage.setItem("User-login", JSON.stringify(userStore));
               this.$router.push('/');
@@ -53,9 +56,39 @@ export default {
               this.$message.error(res.msg);
             }
           })
+        } else {
+          this.$message.error("请按照提示输入正确的登录信息");
         }
       })
     }
+    // login() {
+    //   this.$refs['loginRef'].validate((valid) => {
+    //     if (valid) {
+    //       // 2. 深度克隆，避免修改页面输入框的内容
+    //       let loginData = JSON.parse(JSON.stringify(this.user));
+    //
+    //       // 3. 核心步骤：对密码进行 RSA 加密
+    //       loginData.password = encrypt(loginData.password);
+    //
+    //       // 4. 发送加密后的 loginData 而不是 this.user
+    //       this.$request.post('/user/login', loginData).then(res => {
+    //         if (res.code === 200) { // 建议使用字符串 '200' 匹配后端 Result 习惯
+    //           const userStore = {
+    //             token: res.data.token,
+    //             username: res.data.username,
+    //             role: res.data.role,
+    //             sessionKey: res.data.sessionKey
+    //           };
+    //           localStorage.setItem("User-login", JSON.stringify(userStore));
+    //           this.$router.push('/');
+    //           this.$message.success('登录成功');
+    //         } else {
+    //           this.$message.error(res.msg);
+    //         }
+    //       })
+    //     }
+    //   })
+    // }
     // login() {
     //   this.$refs['loginRef'].validate((valid) => {
     //     if (valid) {

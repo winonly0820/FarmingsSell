@@ -1,7 +1,9 @@
 <script>
 import router from "@/router";
+import CryptoJS from 'crypto-js';
 
 export default {
+
   name: "home",
   data(){
     return{
@@ -20,28 +22,87 @@ created() {
   mounted() {
 
   },
-  methods:{
+  // methods:{
+  //   router() {
+  //     return router
+  //   },
+  //   getFruitsData(){
+  //     this.$request.get('/show/fruit').then(res=>{
+  //       this.fruitsData=res.data;
+  //       // 这里的fruitsData就是在表格中绑定的数据，将返回的数据赋值给这个数据
+  //       // 这里可以使用res.data和你的main.js中的文件没有一点关系，这里是用到了axios
+  //     })},
+  //   getVegetablesData(){
+  //     this.$request.get('/show/vegetable').then(res=>{
+  //       this.vegetablesData=res.data;
+  //     })},
+  // //   下面的方法是用来固定数据的格式的
+  // formatPrice(row, column, cellValue) {
+  //   // cellValue 是当前行的price值
+  //   if (cellValue === null || cellValue === undefined) return '';
+  //   // 转换为数字后保留两位小数（toFixed会自动补0）
+  //   return Number(cellValue).toFixed(2);
+  // }
+  // }
+  methods: {
     router() {
       return router
     },
-    getFruitsData(){
-      this.$request.get('/show/fruit').then(res=>{
-        this.fruitsData=res.data;
-        // 这里的fruitsData就是在表格中绑定的数据，将返回的数据赋值给这个数据
-        // 这里可以使用res.data和你的main.js中的文件没有一点关系，这里是用到了axios
-      })},
-    getVegetablesData(){
-      this.$request.get('/show/vegetable').then(res=>{
-        this.vegetablesData=res.data;
-      })},
-  //   下面的方法是用来固定数据的格式的
-  formatPrice(row, column, cellValue) {
-    // cellValue 是当前行的price值
-    if (cellValue === null || cellValue === undefined) return '';
-    // 转换为数字后保留两位小数（toFixed会自动补0）
-    return Number(cellValue).toFixed(2);
+
+    // 修改后的水果数据获取逻辑
+    getFruitsData() {
+      this.$request.get('/show/fruit').then(res => {
+        if (res.code === 200) {
+          const sessionKey = this.user.sessionKey; // 从本地存储的对象中获取 Key
+
+          // 如果后端返回的是加密字符串，则进行解密
+          if (sessionKey && typeof res.data === 'string') {
+            const decryptedStr = this.decryptAES(res.data, sessionKey);
+            this.fruitsData = JSON.parse(decryptedStr); // 解析解密后的 JSON 字符串
+          } else {
+            this.fruitsData = res.data; // 否则按原逻辑处理
+          }
+        }
+      })
+    },
+
+    // 修改后的蔬菜数据获取逻辑
+    getVegetablesData() {
+      this.$request.get('/show/vegetable').then(res => {
+        if (res.code === 200) {
+          const sessionKey = this.user.sessionKey;
+
+          if (sessionKey && typeof res.data === 'string') {
+            const decryptedStr = this.decryptAES(res.data, sessionKey);
+            this.vegetablesData = JSON.parse(decryptedStr);
+          } else {
+            this.vegetablesData = res.data;
+          }
+        }
+      })
+    },
+
+    // 【新增】通用的 AES 解密工具方法
+    // 必须与后端 Hutool 的加密模式（ECB/Pkcs7）完全一致
+    decryptAES(cipherText, keyStr) {
+      const key = CryptoJS.enc.Utf8.parse(keyStr);
+      const decrypt = CryptoJS.AES.decrypt(
+          { ciphertext: CryptoJS.enc.Hex.parse(cipherText) },
+          key,
+          {
+            mode: CryptoJS.mode.ECB,
+            padding: CryptoJS.pad.Pkcs7
+          }
+      );
+      return decrypt.toString(CryptoJS.enc.Utf8);
+    },
+
+    formatPrice(row, column, cellValue) {
+      if (cellValue === null || cellValue === undefined) return '';
+      return Number(cellValue).toFixed(2);
+    }
   }
-  }
+
 
 //     load(){
 //             this.$request.get('/').then(res=>{
